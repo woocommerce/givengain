@@ -12,6 +12,8 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+$GLOBALS['givengain'] = new Givengain();
+
 final class Givengain {
 	/**
 	 * The main plugin file.
