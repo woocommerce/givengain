@@ -62,14 +62,12 @@ final class Givengain_API {
 	public function request_endpoint_me () {
 		$data = array();
 		if ( ! $this->_has_api_key() ) return false;
-		$response = $this->_request( '/me', array(), 'get' );
+		$response = $this->_request( 'me', array(), 'get' );
 
 		if( is_wp_error( $response ) ) {
 		   $data = new StdClass;
 		} else {
-		   if ( isset( $response->meta->code ) && ( $response->meta->code == 200 ) ) {
-		   		$data = $response;
-		   }
+		   $data = $response;
 		}
 
 		return $data;
@@ -87,6 +85,13 @@ final class Givengain_API {
 				$settings = $this->_get_settings();
 				if ( isset( $settings['api_key'] ) )
 					return $settings['api_key'];
+				else
+					return '';
+			break;
+			case 'client_secret_key':
+				$settings = $this->_get_settings();
+				if ( isset( $settings['client_secret_key'] ) )
+					return $settings['client_secret_key'];
 				else
 					return '';
 			break;
@@ -109,7 +114,8 @@ final class Givengain_API {
 
 		// Default parameters.
 		$params['client_id'] = $this->_client_id;
-		$params['access_token'] = $this->_get( 'access_token' );
+		$params['client_secret_key'] = $this->__get( 'client_secret_key' );
+		$params['access_token'] = $this->__get( 'access_token' );
 
 		if ( $method == 'get' ) {
 			$url = $this->_api_url . $endpoint;
@@ -127,7 +133,6 @@ final class Givengain_API {
 					$url .= $k . '=' . $v;
 				}
 			}
-
 			$response = wp_remote_get( $url,
 				array(
 					'sslverify' => apply_filters( 'https_local_ssl_verify', false )
@@ -180,7 +185,7 @@ final class Givengain_API {
 	 * @return  array Stored settings.
 	 */
 	private function _get_settings () {
-		return wp_parse_args( (array)get_option( $this->_token . '-settings', array( 'api_key' => '' ) ), array( 'api_key' => '' ) );
+		return wp_parse_args( (array)get_option( $this->_token, array( 'api_key' => '', 'client_secret_key' => '' ) ), array( 'api_key' => '', 'client_secret_key' => '' ) );
 	} // End _get_settings()
 } // End Class
 ?>

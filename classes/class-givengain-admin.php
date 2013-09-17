@@ -1,12 +1,23 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+/**
+ * GivenGain Admin Class
+ *
+ * @package WordPress
+ * @subpackage Givengain
+ * @category Admin
+ * @author WooThemes
+ * @since 1.0.0
+ */
 final class Givengain_Admin {
 	private $hook = '';
 	private $settings = null;
 	private $fields = null;
-	private $token = 'givengain';
+	private $_token = 'givengain';
 	private $errors = array();
+	private $_api = '';
+	private $_file = '';
 
 	/**
 	 * Constructor function.
@@ -14,7 +25,9 @@ final class Givengain_Admin {
 	 * @since   1.0.0
 	 * @return  void
 	 */
-	public function __construct () {
+	public function __construct ( $file, $api_obj ) {
+		$this->_file = $file;
+		$this->_api = $api_obj;
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'register_settings_screen' ) );
 		add_action( 'admin_notices', array( $this, 'maybe_display_admin_notices' ) );
@@ -46,12 +59,40 @@ final class Givengain_Admin {
 		screen_icon();
 		echo '<h2>' . esc_html( sprintf( __( '%s Settings', 'givengain' ), $title ) ) . '</h2>' . "\n";
 		echo '<form action="options.php" method="post">' . "\n";
-		settings_fields( 'givengain' );
-		do_settings_sections( 'givengain' );
+		settings_fields( $this->_token );
+		do_settings_sections( $this->_token );
+		// Output an API test console, if the api_key and client_secret_key are both set.
+		echo $this->_maybe_render_api_test_console();
 		submit_button();
 		echo '</form>' . "\n";
 		echo '</div><!--/.wrap-->' . "\n";
 	} // End settings_screen()
+
+	/**
+	 * Render a test console for the API, if the api_key and client_secret_key are both present.
+	 * @access  private
+	 * @since   1.0.0
+	 * @return  string Rendered HTML markup.
+	 */
+	private function _maybe_render_api_test_console () {
+		$settings = $this->get_settings();
+		$html = '';
+		if ( ( isset( $settings['api_key'] ) && '' != $settings['api_key'] ) && ( isset( $settings['client_secret_key'] ) && '' != $settings['client_secret_key'] ) ) {
+			$data = $this->_api->request_endpoint_me();
+			if ( is_object( $data ) && isset( $data->name ) ) {
+				$class = 'success';
+				$message = sprintf( __( 'You can successfully reach the GivenGain API. Hi, %s!', 'givengain' ), $data->name );
+			} else {
+				$class = 'fail';
+				$message = __( 'Oh no! It seems there is an error with your API key and client secret key. Please try again.', 'givengain' );
+			}
+			$html .= '<div id="' . esc_attr( $this->_token . '-api-test-console' ) . '" class="' . esc_attr( $class ) . '">' . "\n";
+			$html .= $message;
+			$html .= '</div>' . "\n";
+			$html .= '<style type="text/css">#' . esc_attr( $this->_token . '-api-test-console' ) . ' { border: 1px dashed #CCCCCC; background: #EBEBEB; color: #999999; font-family: Courier, sans-serif; padding: 0.5em; max-width: 520px; margin: 1.6em 0.6em; } #' . esc_attr( $this->_token . '-api-test-console' ) . '.success { color: #266A2E; } #' . esc_attr( $this->_token . '-api-test-console' ) . '.fail { color: #CC0033; }</style>' . "\n";
+		}
+		return $html;
+	} // End _maybe_render_api_test_console()
 
 	/**
 	 * Register settings fields.
@@ -88,7 +129,7 @@ final class Givengain_Admin {
 	public function form_field_text ( $args = null ) {
 		$options = $this->get_settings();
 
-		echo '<input id="' . $args['key'] . '" name="' . $this->token . '[' . $args['key'] . ']" size="40" type="text" value="' . $options[$args['key']] . '" />' . "\n";
+		echo '<input id="' . $args['key'] . '" name="' . $this->_token . '[' . $args['key'] . ']" size="40" type="text" value="' . $options[$args['key']] . '" />' . "\n";
 		if ( isset( $args['data']['description'] ) ) {
 			echo '<span class="description">' . $args['data']['description'] . '</span>' . "\n";
 		}
@@ -104,7 +145,7 @@ final class Givengain_Admin {
 	public function form_field_textarea ( $args = null ) {
 		$options = $this->get_settings();
 
-		echo '<textarea id="' . $args['key'] . '" name="' . $this->token . '[' . $args['key'] . ']" cols="42" rows="5">' . $options[$args['key']] . '</textarea>' . "\n";
+		echo '<textarea id="' . $args['key'] . '" name="' . $this->_token . '[' . $args['key'] . ']" cols="42" rows="5">' . $options[$args['key']] . '</textarea>' . "\n";
 		if ( isset( $args['data']['description'] ) ) {
 			echo '<p><span class="description">' . $args['data']['description'] . '</span></p>' . "\n";
 		}
@@ -117,7 +158,7 @@ final class Givengain_Admin {
 	 * @return  void
 	 */
 	public function admin_notices () {
-		settings_errors( $this->token . '-errors' );
+		settings_errors( $this->_token . '-errors' );
 	} // End admin_notices()
 
 	/**
@@ -146,11 +187,11 @@ final class Givengain_Admin {
 	protected function parse_errors () {
 		if ( count ( $this->errors ) > 0 ) {
 			foreach ( $this->errors as $k => $v ) {
-				add_settings_error( $this->token . '-errors', $k, $v, 'error' );
+				add_settings_error( $this->_token . '-errors', $k, $v, 'error' );
 			}
 		} else {
 			$message = __( 'Settings updated', 'givengain' );
-			add_settings_error( $this->token . '-errors', $this->token, $message, 'updated' );
+			add_settings_error( $this->_token . '-errors', $this->_token, $message, 'updated' );
 		}
 	} // End parse_errors()
 
@@ -214,7 +255,7 @@ final class Givengain_Admin {
 	 * @return  array
 	 */
 	public function get_settings () {
-		if ( ! is_array( $this->settings ) ) $this->settings = get_option( $this->token, array() );
+		if ( ! is_array( $this->settings ) ) $this->settings = get_option( $this->_token, array() );
 
 		if ( ! is_array( $this->fields ) ) $this->fields = $this->get_settings_fields();
 
@@ -237,8 +278,16 @@ final class Givengain_Admin {
 		$fields = array();
 
 		$fields['api_key'] = array(
-		    'name' => __( 'GivenGain API Key', 'givengain' ),
+		    'name' => __( 'API Key', 'givengain' ),
 		    'description' => sprintf( __( 'Please enter your %sGivenGain API Key%s.', 'givengain' ), '<a href="' . esc_url( 'https://www.givengain.com/api/key/' ) . '" title="' . esc_attr( __( 'Get your API key from the GivenGain website.', 'givengain' ) ) . '">', '</a>' ),
+		    'type' => 'text',
+		    'default' => '',
+		    'section' => 'access'
+		);
+
+		$fields['client_secret_key'] = array(
+		    'name' => __( 'Client Secret Key', 'givengain' ),
+		    'description' => sprintf( __( 'Please enter your %sGivenGain Client Secret Key%s.', 'givengain' ), '<a href="' . esc_url( 'https://www.givengain.com/api/key/' ) . '" title="' . esc_attr( __( 'Get your API key from the GivenGain website.', 'givengain' ) ) . '">', '</a>' ),
 		    'type' => 'text',
 		    'default' => '',
 		    'section' => 'access'

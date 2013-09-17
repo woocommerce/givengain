@@ -14,6 +14,15 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 $GLOBALS['givengain'] = new Givengain();
 
+/**
+ * GivenGain Class
+ *
+ * @package WordPress
+ * @subpackage Givengain
+ * @category Core
+ * @author WooThemes
+ * @since 1.0.0
+ */
 final class Givengain {
 	/**
 	 * The main plugin file.
@@ -22,6 +31,14 @@ final class Givengain {
 	 * @var     string
 	 */
 	private $_file;
+
+	/**
+	 * An instance of the Givengain_API class.
+	 * @access  public
+	 * @since   1.0.0
+	 * @var     string
+	 */
+	public $api;
 
 	/**
 	 * The context in which the plugin is functioning (admin or frontend.
@@ -39,12 +56,14 @@ final class Givengain {
 	 */
 	public function __construct () {
 		$this->_file = __FILE__;
+		require_once( 'classes/class-givengain-api.php' );
+			$this->api = new Givengain_API( $this->_file );
 		if ( is_admin() ) {
 			require_once( 'classes/class-givengain-admin.php' );
-			$this->context = new Givengain_Admin();
+			$this->context = new Givengain_Admin( $this->_file, $this->api );
 		} else {
 			require_once( 'classes/class-givengain-frontend.php' );
-			$this->context = new Givengain_Frontend();
+			$this->context = new Givengain_Frontend( $this->_file, $this->api );
 		}
 	} // End __construct()
 
