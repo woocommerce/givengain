@@ -17,6 +17,7 @@ final class Givengain_Admin {
 	public function __construct () {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'register_settings_screen' ) );
+		add_action( 'admin_notices', array( $this, 'maybe_display_admin_notices' ) );
 	} // End __construct()
 
 	/**
@@ -237,7 +238,7 @@ final class Givengain_Admin {
 
 		$fields['api_key'] = array(
 		    'name' => __( 'GivenGain API Key', 'givengain' ),
-		    'description' => __( 'Please enter your GivenGain API Key.', 'givengain' ),
+		    'description' => sprintf( __( 'Please enter your %sGivenGain API Key%s.', 'givengain' ), '<a href="' . esc_url( 'https://www.givengain.com/api/key/' ) . '" title="' . esc_attr( __( 'Get your API key from the GivenGain website.', 'givengain' ) ) . '">', '</a>' ),
 		    'type' => 'text',
 		    'default' => '',
 		    'section' => 'access'
@@ -264,5 +265,21 @@ final class Givengain_Admin {
 			break;
 		}
 	} // End settings_section_text()
+
+	/**
+	 * Display an admin notice, if not on the admin screen and if the account isn't yet connected.
+	 * @access public
+	 * @since  1.0.0
+	 * @return void
+	 */
+	public function maybe_display_admin_notices () {
+		if ( ( isset( $_GET['page'] ) && 'givengain' == $_GET['page'] ) ) return; // Don't show these notices on our admin screen.
+
+		$settings = $this->get_settings();
+		if ( ! isset( $settings['api_key'] ) || '' == $settings['api_key'] ) {
+			$url = add_query_arg( 'page', 'givengain', admin_url( 'admin.php' ) );
+			echo '<div class="updated fade"><p>' . sprintf( __( '%sGivenGain is almost ready.%s To get started, %senter your GivenGain API key%s.', 'givengain' ), '<strong>', '</strong>', '<a href="' . esc_url( $url ) . '">', '</a>' ) . '</p></div>' . "\n";
+		}
+	} // End maybe_display_admin_notices()
 } // End Class
 ?>
