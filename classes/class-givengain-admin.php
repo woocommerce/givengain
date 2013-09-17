@@ -77,14 +77,14 @@ final class Givengain_Admin {
 	private function _maybe_render_api_test_console () {
 		$settings = $this->get_settings();
 		$html = '';
-		if ( ( isset( $settings['api_key'] ) && '' != $settings['api_key'] ) && ( isset( $settings['client_secret_key'] ) && '' != $settings['client_secret_key'] ) ) {
+		if ( ( isset( $settings['access_token'] ) && '' != $settings['access_token'] ) ) {
 			$data = $this->_api->request_endpoint_me();
 			if ( is_object( $data ) && isset( $data->name ) ) {
 				$class = 'success';
 				$message = sprintf( __( 'You can successfully reach the GivenGain API. Hi, %s!', 'givengain' ), $data->name );
 			} else {
 				$class = 'fail';
-				$message = __( 'Oh no! It seems there is an error with your API key and client secret key. Please try again.', 'givengain' );
+				$message = __( 'Oh no! It seems there is an error with your API key. Please try again.', 'givengain' );
 			}
 			$html .= '<div id="' . esc_attr( $this->_token . '-api-test-console' ) . '" class="' . esc_attr( $class ) . '">' . "\n";
 			$html .= $message;
@@ -277,17 +277,9 @@ final class Givengain_Admin {
 	public function get_settings_fields () {
 		$fields = array();
 
-		$fields['api_key'] = array(
+		$fields['access_token'] = array(
 		    'name' => __( 'API Key', 'givengain' ),
 		    'description' => sprintf( __( 'Please enter your %sGivenGain API Key%s.', 'givengain' ), '<a href="' . esc_url( 'https://www.givengain.com/api/key/' ) . '" title="' . esc_attr( __( 'Get your API key from the GivenGain website.', 'givengain' ) ) . '">', '</a>' ),
-		    'type' => 'text',
-		    'default' => '',
-		    'section' => 'access'
-		);
-
-		$fields['client_secret_key'] = array(
-		    'name' => __( 'Client Secret Key', 'givengain' ),
-		    'description' => sprintf( __( 'Please enter your %sGivenGain Client Secret Key%s.', 'givengain' ), '<a href="' . esc_url( 'https://www.givengain.com/api/key/' ) . '" title="' . esc_attr( __( 'Get your API key from the GivenGain website.', 'givengain' ) ) . '">', '</a>' ),
 		    'type' => 'text',
 		    'default' => '',
 		    'section' => 'access'

@@ -61,7 +61,7 @@ final class Givengain_API {
 	 */
 	public function request_endpoint_me () {
 		$data = array();
-		if ( ! $this->_has_api_key() ) return false;
+		if ( ! $this->_has_access_token() ) return false;
 		$response = $this->_request( 'me', array(), 'get' );
 
 		if( is_wp_error( $response ) ) {
@@ -83,15 +83,8 @@ final class Givengain_API {
 		switch ( $key ) {
 			case 'access_token':
 				$settings = $this->_get_settings();
-				if ( isset( $settings['api_key'] ) )
-					return $settings['api_key'];
-				else
-					return '';
-			break;
-			case 'client_secret_key':
-				$settings = $this->_get_settings();
-				if ( isset( $settings['client_secret_key'] ) )
-					return $settings['client_secret_key'];
+				if ( isset( $settings['access_token'] ) )
+					return $settings['access_token'];
 				else
 					return '';
 			break;
@@ -110,11 +103,10 @@ final class Givengain_API {
 	 */
 	private function _request ( $endpoint, $params = array(), $method = 'post' ) {
 		$return = '';
-		if ( ! $this->_has_api_key() ) return $return;
+		if ( ! $this->_has_access_token() ) return $return;
 
 		// Default parameters.
 		$params['client_id'] = $this->_client_id;
-		$params['client_secret_key'] = $this->__get( 'client_secret_key' );
 		$params['access_token'] = $this->__get( 'access_token' );
 
 		if ( $method == 'get' ) {
@@ -160,11 +152,11 @@ final class Givengain_API {
 	 * @since   1.0.0
 	 * @return  boolean False if none, true if exists.
 	 */
-	private function _has_api_key () {
+	private function _has_access_token () {
 		$settings = $this->_get_settings();
-		if ( ! isset( $settings['api_key'] ) || '' == $settings['api_key'] ) return false;
+		if ( ! isset( $settings['access_token'] ) || '' == $settings['access_token'] ) return false;
 		return true;
-	} // End _has_api_key()
+	} // End _has_access_token()
 
 	/**
 	 * If the parameter is an object with our expected properties, display an error notice.
@@ -185,7 +177,7 @@ final class Givengain_API {
 	 * @return  array Stored settings.
 	 */
 	private function _get_settings () {
-		return wp_parse_args( (array)get_option( $this->_token, array( 'api_key' => '', 'client_secret_key' => '' ) ), array( 'api_key' => '', 'client_secret_key' => '' ) );
+		return wp_parse_args( (array)get_option( $this->_token, array( 'access_token' => '' ) ), array( 'access_token' => '' ) );
 	} // End _get_settings()
 } // End Class
 ?>
