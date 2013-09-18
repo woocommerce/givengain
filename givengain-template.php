@@ -45,7 +45,7 @@ function givengain_output ( $type = 'cause', $args = '' ) {
 	$args = wp_parse_args( $args, $defaults );
 
 	// Make sure we have a clean query_args array.
-	$query_args = array();
+	$query_args = array( 'limit' => intval( $args['limit'] ) );
 	foreach ( $args as $k => $v ) {
 		if ( ! in_array( $k, array_keys( $defaults ) ) ) $query_args[$k] = $v;
 	}

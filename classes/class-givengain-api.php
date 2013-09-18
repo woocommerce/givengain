@@ -29,30 +29,6 @@ final class Givengain_API {
 	} // End __construct()
 
 	/**
-	 * Retrieve data for the /me endpoint.
-	 * @access  public
-	 * @since   1.0.0
-	 * @return  array
-	 */
-	public function get_endpoint_me () {
-		$data = '';
-		$transient_key = $this->_token . '-endpoint-me';
-
-// delete_transient( $transient_key ); // DEBUG
-
-		if ( false === ( $data = get_transient( $transient_key ) ) ) {
-			$response = $this->request_endpoint_me();
-
-			if ( isset( $response->data ) ) {
-				$data = json_encode( $response );
-				set_transient( $transient_key, $data, $this->_transient_expire_time );
-			}
-		}
-
-		return json_decode( $data );
-	} // End get_endpoint_me()
-
-	/**
 	 * Generic getting for private properties.
 	 * @access  public
 	 * @since   1.0.0
@@ -160,6 +136,8 @@ final class Givengain_API {
 			if ( stristr( $endpoint, '/%' . $v . '%' ) && in_array( $v, array_keys( $args ) ) ) {
 				$replace = '/' . urlencode( $args[$v] );
 				unset( $args[$v] );
+			} else {
+				if ( isset( $args['type'] ) ) unset( $args['type'] );
 			}
 			$endpoint = str_replace( '/%' . $v . '%', $replace, $endpoint );
 		}
@@ -188,7 +166,7 @@ final class Givengain_API {
 		if ( $method == 'get' ) {
 			$url = $this->_api_url . $endpoint;
 
-			if ( count( $params ) > 0 ) {
+			if ( 0 < count( $params ) ) {
 				$url .= '?';
 				$count = 0;
 				foreach ( $params as $k => $v ) {
@@ -201,6 +179,7 @@ final class Givengain_API {
 					$url .= $k . '=' . $v;
 				}
 			}
+
 			$response = wp_remote_get( $url,
 				array(
 					'sslverify' => apply_filters( 'https_local_ssl_verify', false )
