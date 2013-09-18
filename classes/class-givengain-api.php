@@ -102,13 +102,25 @@ final class Givengain_API {
 		return array(
 					'me',
 					'cause',
+					'cause/%cause_id%',
 					'cause_project',
+					'cause_project/%cause_project_id%',
+					'cause_project/%cause_project_id%/comment',
 					'cause_post',
+					'cause_post/%cause_post_id%',
+					'cause_post/%cause_post_id%/comment',
 					'activist',
+					'activist/%activist_id%',
+					'activist/%activist_id%/comment',
 					'activist_project',
+					'activist_project/%activist_project_id%',
+					'activist_project/%activist_project_id%/comment',
 					'donation',
+					'donation/%donation_id%',
 					'comment',
-					'location'
+					'comment/%comment_id%',
+					'location',
+					'location/%location_id%'
 				);
 	} // End _get_accepted_endpoints()
 
@@ -123,7 +135,9 @@ final class Givengain_API {
 	public function get_data ( $endpoint, $args = array(), $method = 'get' ) {
 		$data = array();
 		if ( ! $this->_has_access_token() || ! in_array( $endpoint, $this->_get_accepted_endpoints() ) ) return false;
-		$response = $this->_request( $endpoint, $args, $method );
+		// Detect and parse the various ID values possible for API endpoints.
+		$parsed = $this->_parse_api_endpoint_id_values( $endpoint, $args );
+		$response = $this->_request( $parsed['endpoint'], $parsed['args'], $method );
 
 		if( is_wp_error( $response ) ) {
 		   $data = new StdClass;
@@ -133,6 +147,27 @@ final class Givengain_API {
 
 		return $data;
 	} // End get_data()
+
+	/**
+	 * Parse the various placeholder values in our supported API endpoints, if the corresponding argument is present. If not, replace with an empty string.
+	 * @param  string $endpoint API endpoint proposed.
+	 * @param  array $args      Arguments for the API request.
+	 * @return array            Parsed endpoint and arguments in a combined array with "endpoint" and "args" keys.
+	 */
+	private function _parse_api_endpoint_id_values ( $endpoint, $args ) {
+		foreach ( array( 'cause_id', 'cause_project_id', 'activist_id', 'activist_project_id', 'donation_id', 'comment_id', 'location_id' ) as $k => $v ) {
+			$replace = '';
+			if ( stristr( $endpoint, '/%' . $v . '%' ) && in_array( $v, array_keys( $args ) ) ) {
+				$replace = '/' . urlencode( $args[$v] );
+				unset( $args[$v] );
+			}
+			$endpoint = str_replace( '/%' . $v . '%', $replace, $endpoint );
+		}
+
+		$return = array( 'endpoint' => $endpoint, 'args' => $args );
+
+		return $return;
+	} // End _parse_api_endpoint_id_values()
 
 	/**
 	 * Make a request to the API.
