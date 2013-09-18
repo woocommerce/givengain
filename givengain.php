@@ -14,6 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 $GLOBALS['givengain'] = new Givengain();
 
+// Load in the frontend template functions.
+require_once( 'givengain-template.php' );
+
 /**
  * GivenGain Class
  *

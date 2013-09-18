@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @since 1.0.0
  */
 final class Givengain_Frontend {
-	private $_api = '';
+	public $api = '';
 	private $_file = '';
 
 	/**
@@ -22,7 +22,7 @@ final class Givengain_Frontend {
 	 */
 	public function __construct ( $file, $api_obj ) {
 		$this->_file = $file;
-		$this->_api = $api_obj;
+		$this->api = $api_obj;
 	} // End __construct()
 } // End Class
 ?>
