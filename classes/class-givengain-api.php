@@ -53,27 +53,6 @@ final class Givengain_API {
 	} // End get_endpoint_me()
 
 	/**
-	 * Retrieve data from the /me endpoint.
-	 * @access  public
-	 * @since   1.0.0
-	 * @param   array $args
-	 * @return  array
-	 */
-	public function request_endpoint_me () {
-		$data = array();
-		if ( ! $this->_has_access_token() ) return false;
-		$response = $this->_request( 'me', array(), 'get' );
-
-		if( is_wp_error( $response ) ) {
-		   $data = new StdClass;
-		} else {
-		   $data = $response;
-		}
-
-		return $data;
-	} // End request_endpoint_me()
-
-	/**
 	 * Generic getting for private properties.
 	 * @access  public
 	 * @since   1.0.0
@@ -92,6 +71,68 @@ final class Givengain_API {
 			break;
 		}
 	} // End __get()
+
+	/**
+	 * Retrieve profile data for the stored API key, as an API status check.
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  array
+	 */
+	public function api_status_check () {
+		$data = array();
+		if ( ! $this->_has_access_token() ) return false;
+		$response = $this->_request( 'me', array(), 'get' );
+
+		if( is_wp_error( $response ) ) {
+		   $data = new StdClass;
+		} else {
+		   $data = $response;
+		}
+
+		return $data;
+	} // End api_status_check()
+
+	/**
+	 * Return an array of accepted API endpoints.
+	 * @access  private
+	 * @since   1.0.0
+	 * @return  array Accepted API endpoints.
+	 */
+	private function _get_accepted_endpoints () {
+		return array(
+					'me',
+					'cause',
+					'cause_project',
+					'cause_post',
+					'activist',
+					'activist_project',
+					'donation',
+					'comment',
+					'location'
+				);
+	} // End _get_accepted_endpoints()
+
+	/**
+	 * Retrieve data from the specified endpoint.
+	 * @access  public
+	 * @since   1.0.0
+	 * @param   string $endpoint The API endpoint to touch.
+	 * @param   array $args
+	 * @return  array
+	 */
+	public function get_data ( $endpoint, $args = array(), $method = 'get' ) {
+		$data = array();
+		if ( ! $this->_has_access_token() || ! in_array( $endpoint, $this->_get_accepted_endpoints() ) ) return false;
+		$response = $this->_request( $endpoint, $args, $method );
+
+		if( is_wp_error( $response ) ) {
+		   $data = new StdClass;
+		} else {
+		   $data = $response;
+		}
+
+		return $data;
+	} // End get_data()
 
 	/**
 	 * Make a request to the API.

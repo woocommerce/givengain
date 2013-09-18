@@ -78,7 +78,7 @@ final class Givengain_Admin {
 		$settings = $this->get_settings();
 		$html = '';
 		if ( ( isset( $settings['access_token'] ) && '' != $settings['access_token'] ) ) {
-			$data = $this->_api->request_endpoint_me();
+			$data = $this->_api->api_status_check();
 			if ( is_object( $data ) && isset( $data->name ) ) {
 				$class = 'success';
 				$message = sprintf( __( 'You can successfully reach the GivenGain API. Hi, %s!', 'givengain' ), $data->name );
