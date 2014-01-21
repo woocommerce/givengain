@@ -18,7 +18,7 @@ function givengain_get_data ( $type = 'cause', $args = '' ) {
  *
  * @since  1.0.0
  */
-add_action( 'givengain_causes', 'givengain_output' );
+add_action( 'givengain', 'givengain_output' );
 
 if ( ! function_exists( 'givengain_output' ) ) {
 /**
