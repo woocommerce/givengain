@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( ! function_exists( 'givengain_get_causes' ) ) {
+if ( ! function_exists( 'givengain_get_data' ) ) {
 /**
  * Wrapper function to get the data from the Givengain_Frontend class.
  * @param  string/array $args  Arguments.
@@ -9,8 +9,7 @@ if ( ! function_exists( 'givengain_get_causes' ) ) {
  * @return array/boolean       Array if true, boolean if false.
  */
 function givengain_get_data ( $type = 'cause', $args = '' ) {
-	global $givengain;
-	return $givengain->context->api->get_data( $type, $args );
+	return Givengain()->context->api->get_data( $type, $args );
 } // End givengain_get_data()
 }
 

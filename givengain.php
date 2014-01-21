@@ -12,10 +12,20 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-$GLOBALS['givengain'] = new Givengain();
-
 // Load in the frontend template functions.
 require_once( 'givengain-template.php' );
+
+/**
+ * Returns the main instance of Givengain to prevent the need to use globals.
+ *
+ * @since  1.0.0
+ * @return object Givengain
+ */
+function Givengain() {
+	return Givengain::instance();
+} // End Givengain()
+
+Kudos();
 
 /**
  * GivenGain Class
@@ -27,6 +37,14 @@ require_once( 'givengain-template.php' );
  * @since 1.0.0
  */
 final class Givengain {
+	/**
+	 * The single instance of Givengain.
+	 * @var 	object
+	 * @access  private
+	 * @since 	1.0.0
+	 */
+	private static $_instance = null;
+
 	/**
 	 * The main plugin file.
 	 * @access  private
@@ -69,6 +87,40 @@ final class Givengain {
 			$this->context = new Givengain_Frontend( $this->_file, $this->api );
 		}
 	} // End __construct()
+
+	/**
+	 * Main Givengain Instance
+	 *
+	 * Ensures only one instance of Givengain is loaded or can be loaded.
+	 *
+	 * @since 1.0.0
+	 * @static
+	 * @see Givengain()
+	 * @return Main Givengain instance
+	 */
+	public static function instance () {
+		if ( is_null( self::$_instance ) )
+			self::$_instance = new self();
+		return self::$_instance;
+	} // End instance()
+
+	/**
+	 * Cloning is forbidden.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __clone () {
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?' ), '1.0.0' );
+	} // End __clone()
+
+	/**
+	 * Unserializing instances of this class is forbidden.
+	 *
+	 * @since 1.0.0
+	 */
+	public function __wakeup () {
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?' ), '1.0.0' );
+	} // End __wakeup()
 
 	/**
 	 * Generic setter for private properties.
