@@ -25,7 +25,7 @@ function Givengain() {
 	return Givengain::instance();
 } // End Givengain()
 
-Kudos();
+Givengain();
 
 /**
  * GivenGain Class
