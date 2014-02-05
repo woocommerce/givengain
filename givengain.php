@@ -7,7 +7,7 @@
  * Author URI: http://woothemes.com/
  * Version: 1.0.0
  * Stable tag: 1.0.0
- * License: GPL v2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+ * License: GPL v3 or later - http://www.gnu.org/licenses/old-licenses/gpl-3.0.html
  */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
