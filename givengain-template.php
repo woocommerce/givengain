@@ -1,6 +1,37 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+if ( ! function_exists( 'is_givengain_entry' ) ) {
+/**
+ * Determine if we're viewing a GivenGain entry.
+ * @since  1.0.0
+ * @return boolean
+ */
+function is_givengain_entry () {
+	$response = false;
+	if ( '' != get_query_var( 'givengain-entry' ) )
+		$response = true;
+
+	return $response;
+} // End is_givengain_entry()
+}
+
+if ( ! function_exists( 'is_givengain_archive' ) ) {
+/**
+ * Determine if we're viewing a GivenGain archive.
+ * @since  1.0.0
+ * @return boolean
+ */
+function is_givengain_archive () {
+	$response = false;
+	$type = get_query_var( 'givengain-type' );
+	if ( '' == get_query_var( 'givengain-entry' ) && '' != $type && in_array( $type, array( 'cause', 'cause_project', 'cause_post', 'activist', 'activist_project' ) ) )
+		$response = true;
+
+	return $response;
+} // End is_givengain_archive()
+}
+
 if ( ! function_exists( 'givengain_get_data' ) ) {
 /**
  * Wrapper function to get the data from the Givengain_Frontend class.

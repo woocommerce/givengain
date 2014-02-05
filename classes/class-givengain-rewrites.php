@@ -56,10 +56,14 @@ final class Givengain_Rewrites {
 	public function add_rewrite_rules ( $rules ) {
 		global $wp_rewrite;
 
+		$rewrite_rule_structure = $wp_rewrite->root . 'givengain/%givengain-type%';
+		$new_rewrite_rules_archives = $wp_rewrite->generate_rewrite_rules( $rewrite_rule_structure );
+
 		$rewrite_rule_structure = $wp_rewrite->root . 'givengain/%givengain-type%/%givengain-entry%';
 		$new_rewrite_rules = $wp_rewrite->generate_rewrite_rules( $rewrite_rule_structure );
 
-		return ( $rules + $new_rewrite_rules );
+		// First the archive rules, then the others, and then the single view rules. This is to ensure the archive view works correctly.
+		return ( $new_rewrite_rules_archives + $rules + $new_rewrite_rules );
 	} // End add_rewrite_rules()
 } // End Class
 ?>
