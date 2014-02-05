@@ -70,6 +70,14 @@ final class Givengain {
 	public $context;
 
 	/**
+	 * The custom URL rewrite rules, for displaying GivenGain API data.
+	 * @access  public
+	 * @since   1.0.0
+	 * @var     object
+	 */
+	public $rewrites;
+
+	/**
 	 * Class constructor.
 	 * @access  public
 	 * @since   1.0.0
@@ -77,12 +85,22 @@ final class Givengain {
 	 */
 	public function __construct () {
 		$this->_file = __FILE__;
+
+		// Instantiate the GivenGain API connector class.
 		require_once( 'classes/class-givengain-api.php' );
-			$this->api = new Givengain_API( $this->_file );
+		$this->api = new Givengain_API( $this->_file );
+
+		// Instantiate the GivenGain rewrite rules class.
+		require_once( 'classes/class-givengain-rewrites.php' );
+		$this->rewrites = new Givegain_Rewrites();
+
 		if ( is_admin() ) {
+			// Instantiate the GivenGain administration class.
 			require_once( 'classes/class-givengain-admin.php' );
 			$this->context = new Givengain_Admin( $this->_file, $this->api );
 		} else {
+
+			// Instantiate the GivenGain frontend output class.
 			require_once( 'classes/class-givengain-frontend.php' );
 			$this->context = new Givengain_Frontend( $this->_file, $this->api );
 		}
