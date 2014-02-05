@@ -20,7 +20,7 @@ final class Givengain_Rewrites {
 	public function __construct () {
 		add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
 		add_filter( 'rewrite_rules_array',array( $this, 'add_rewrite_rules' ) );
-		add_action( 'generate_rewrite_rules', array( $this, 'add_rewrite_tags' ) );
+		add_action( 'init', array( $this, 'add_rewrite_tags' ) );
 	} // End __construct()
 
 	/**
@@ -43,8 +43,8 @@ final class Givengain_Rewrites {
 	 * @return  void
 	 */
 	public function add_rewrite_tags () {
-		add_rewrite_tag( '%givengain-type%', '(.+?)', 'givengain-type=' );
-		add_rewrite_tag( '%givengain-entry%', '(.+?)', 'givengain-entry=' );
+		add_rewrite_tag( '%givengain-type%', '([^/]*)' );
+		add_rewrite_tag( '%givengain-entry%', '([^/]*)' );
 	} // End add_rewrite_tags()
 
 	/**
@@ -56,8 +56,8 @@ final class Givengain_Rewrites {
 	public function add_rewrite_rules ( $rules ) {
 		global $wp_rewrite;
 
-		$rewrite_rule_structure = $wp_rewrite->root . '%givengain-type%/%givengain-entry%';
-		$new_rewrite_rules = $wp_rewrite->generate_rewrite_rules( $keywords_structure );
+		$rewrite_rule_structure = $wp_rewrite->root . 'givengain/%givengain-type%/%givengain-entry%';
+		$new_rewrite_rules = $wp_rewrite->generate_rewrite_rules( $rewrite_rule_structure );
 
 		return ( $rules + $new_rewrite_rules );
 	} // End add_rewrite_rules()
