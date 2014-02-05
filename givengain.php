@@ -54,6 +54,14 @@ final class Givengain {
 	private $_file;
 
 	/**
+	 * The plugin's version.
+	 * @access  private
+	 * @since   1.0.0
+	 * @var     string
+	 */
+	private $_version;
+
+	/**
 	 * An instance of the Givengain_API class.
 	 * @access  public
 	 * @since   1.0.0
@@ -85,6 +93,7 @@ final class Givengain {
 	 */
 	public function __construct () {
 		$this->_file = __FILE__;
+		$this->_version = '1.0.0';
 
 		// Instantiate the GivenGain API connector class.
 		require_once( 'classes/class-givengain-api.php' );
@@ -92,7 +101,7 @@ final class Givengain {
 
 		// Instantiate the GivenGain rewrite rules class.
 		require_once( 'classes/class-givengain-rewrites.php' );
-		$this->rewrites = new Givegain_Rewrites();
+		$this->rewrites = new Givengain_Rewrites();
 
 		if ( is_admin() ) {
 			// Instantiate the GivenGain administration class.
@@ -104,6 +113,9 @@ final class Givengain {
 			require_once( 'classes/class-givengain-frontend.php' );
 			$this->context = new Givengain_Frontend( $this->_file, $this->api );
 		}
+
+		// Run this on activation.
+		register_activation_hook( $this->file, array( $this, 'activation' ) );
 	} // End __construct()
 
 	/**
@@ -141,23 +153,60 @@ final class Givengain {
 	} // End __wakeup()
 
 	/**
-	 * Generic setter for private properties.
-	 * @access  public
-	 * @since   1.0.0
-	 * @return  void
+	 * Load the plugin's localisation file.
+	 * @access public
+	 * @since 1.0.0
+	 * @return void
 	 */
-	public function __set ( $key, $value ) {
-		// TODO
-	} // End __set()
+	public function load_localisation () {
+		load_plugin_textdomain( 'givengain', false, dirname( plugin_basename( $this->file ) ) . '/lang/' );
+	} // End load_localisation()
 
 	/**
-	 * Generic getting for private properties.
-	 * @access  public
-	 * @since   1.0.0
-	 * @return  mixed
+	 * Load the plugin textdomain from the main WordPress "languages" folder.
+	 * @since  1.0.0
+	 * @return  void
 	 */
-	public function __get ( $key ) {
-		// TODO
-	} // End __get()
+	public function load_plugin_textdomain () {
+	    $domain = 'givengain';
+	    // The "plugin_locale" filter is also used in load_plugin_textdomain()
+	    $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
+
+	    load_textdomain( $domain, WP_LANG_DIR . '/' . $domain . '/' . $domain . '-' . $locale . '.mo' );
+	    load_plugin_textdomain( $domain, FALSE, dirname( plugin_basename( $this->file ) ) . '/lang/' );
+	} // End load_plugin_textdomain()
+
+	/**
+	 * Run on activation.
+	 * @access public
+	 * @since  1.0.0
+	 * @return void
+	 */
+	public function activation () {
+		$this->register_plugin_version();
+		$this->flush_rewrite_rules();
+	} // End activation()
+
+	/**
+	 * Register the plugin's version.
+	 * @access public
+	 * @since  1.0.0
+	 * @return void
+	 */
+	private function register_plugin_version () {
+		if ( '' != $this->_version ) {
+			update_option( 'givengain' . '-version', $this->_version );
+		}
+	} // End register_plugin_version()
+
+	/**
+	 * Flush the rewrite rules
+	 * @access public
+	 * @since  1.0.0
+	 * @return void
+	 */
+	private function flush_rewrite_rules () {
+		flush_rewrite_rules();
+	} // End flush_rewrite_rules()
 } // End Class
 ?>
