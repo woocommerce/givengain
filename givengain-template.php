@@ -1,19 +1,19 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-if ( ! function_exists( 'is_givengain_entry' ) ) {
+if ( ! function_exists( 'is_givengain_single' ) ) {
 /**
  * Determine if we're viewing a GivenGain entry.
  * @since  1.0.0
  * @return boolean
  */
-function is_givengain_entry () {
+function is_givengain_single () {
 	$response = false;
 	if ( '' != get_query_var( 'givengain-entry' ) )
 		$response = true;
 
 	return $response;
-} // End is_givengain_entry()
+} // End is_givengain_single()
 }
 
 if ( ! function_exists( 'is_givengain_archive' ) ) {
