@@ -122,18 +122,29 @@ final class Givengain_Frontend {
 				$url = site_url();
 				$url_bits = explode( '/', str_replace( 'http://', '', $post->guid ) );
 
+				$args = array( 'givengain-type' => $url_bits[1] );
+				if ( isset( $url_bits[2] ) && '' != $url_bits[2] ) {
+					$args['givengain-entry'] = $url_bits[2];
+				}
+
+				// If this is a sub-content type, use those values instead, and make a new type setting, combining 2 and 4.
+				if ( isset( $url_bits[3] ) && isset( $url_bits[4] ) ) {
+					$args['givengain-type'] = $url_bits[1] . '_' . $url_bits[3];
+					$args['givengain-entry'] = $url_bits[4];
+				}
+
+				if ( 's' == substr($args['givengain-type'], -1 ) ) {
+					$args['givengain-type'] = substr($args['givengain-type'], 0, ( strlen( $args['givengain-type'] ) -1 ) );
+				}
+
 				if ( '' == $structure ) {
 					// We're using the default structure, so many a query string.
-					$args = array( 'givengain-type' => $url_bits[1] );
-					if ( isset( $url_bits[2] ) && '' != $url_bits[2] ) {
-						$args['givengain-entry'] = $url_bits[2];
-					}
 					foreach ( $args as $k => $v ) {
 						$url = add_query_arg( $k, urlencode( $v ), $url );
 					}
 				} else {
 					// Make a pretty permalink.
-					$url = trailingslashit( site_url( '/givengain' ) ) . trailingslashit( urlencode( $url_bits[1] ) ) . trailingslashit( urlencode( $url_bits[2] ) );
+					$url = trailingslashit( site_url( '/givengain' ) ) . trailingslashit( urlencode( $args['givengain-type'] ) ) . trailingslashit( urlencode( $args['givengain-entry'] ) );
 				}
 
 				$permalink = $url;
@@ -153,12 +164,28 @@ final class Givengain_Frontend {
 	private function _format_api_response ( $data ) {
 		$response = new stdClass();
 		$response->ID = $data->id;
-		$response->post_title = $data->name;
 		$response->guid = $data->link;
 		$response->post_type = 'givengain';
 		$response->givengain_data = array();
 
-		// A few parameters are only there for single entries. Work with those.
+		// A few parameters are only there for single entries or special cases. Work with those.
+		if ( isset( $data->name ) ) {
+			$response->post_title = $data->name;
+			unset( $data->name );
+		} else {
+			if ( isset( $data->first_name ) && isset( $data->last_name ) ) {
+				$response->post_title = $data->first_name . ' ' . $data->last_name;
+				unset( $data->first_name );
+				unset( $data->last_name );
+			}
+		}
+
+		if ( isset( $data->bio ) ) {
+			$response->post_content = $data->bio;
+			$response->post_excerpt = apply_filters( 'get_the_excerpt', $data->bio );
+			unset( $data->bio );
+		}
+
 		if ( isset( $data->description ) ) {
 			$response->post_content = $data->description;
 			$response->post_excerpt = apply_filters( 'get_the_excerpt', $data->description );
@@ -167,7 +194,6 @@ final class Givengain_Frontend {
 
 		// Remove the parameters we've already used.
 		unset( $data->id );
-		unset( $data->name );
 		unset( $data->link );
 
 		// Store any left over parameters in a dedicated array.
