@@ -27,7 +27,22 @@ final class Givengain_Frontend {
 		add_action( 'pre_get_posts', array( $this, 'prepare_output_object' ) );
 		add_action( 'template_redirect', array( $this, 'hijack_wp_query' ) );
 		add_filter( 'post_link', array( $this, 'hijack_permalink' ), 10, 3 );
+		add_action( 'the_post', array( $this, 'setup_the_post' ) );
 	} // End __construct()
+
+	/**
+	 * Setup data for the current GivenGain entry.
+	 * @access  public
+	 * @since   1.0.0
+	 * @return  void
+	 */
+	public function setup_the_post () {
+		if ( ! is_givengain_archive() && ! is_givengain_single() ) return;
+		global $post, $wp_object_cache, $wp_query;
+		$post_data = get_post( $post );
+		$wp_object_cache->posts[$wp_query->current_post] = $post_data;
+		$wp_query->posts[$wp_query->current_post] = $post_data;
+	} // End setup_the_post()
 
 	/**
 	 * On GivenGain screens, replace query data with GivenGain API data.
@@ -67,8 +82,7 @@ final class Givengain_Frontend {
 				if ( 1 == $count ) {
 					$post = $data[$k];
 				}
-
-				$wp_object_cache->posts[$data[$k]->ID] = $data[$k];
+				wp_cache_add( $data[$k]->ID, $data[$k], 'posts' );
 				$wp_query->posts[] = $data[$k];
 			}
 
