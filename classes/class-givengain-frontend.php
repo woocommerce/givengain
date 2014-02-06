@@ -70,6 +70,11 @@ final class Givengain_Frontend {
 
 		$data = $this->_get_api_data( $endpoint, $args );
 
+		// Make sure we always have an array, to simplify the rest of our logic.
+		if ( ! is_array( $data ) ) {
+			$data = array( $data );
+		}
+
 		if ( 0 < count( $data ) ) {
 			$count = 0;
 			// Backup normal posts, and replace with GivenGain posts.
@@ -109,10 +114,29 @@ final class Givengain_Frontend {
 	 */
 	public function hijack_permalink ( $permalink, $post, $leavename ) {
 		if ( 'givengain' == $post->post_type ) {
-			if ( true == apply_filters( 'givengain_link_externally', true ) ) {
+			if ( true == apply_filters( 'givengain_link_externally', false ) ) {
 				$permalink = esc_url( $post->guid );
 			} else {
 				// TODO - Create internal links, using custom permalink structure, or default, based on stored permastruct.
+				$structure = get_option( 'permalink_structure' );
+				$url = site_url();
+				$url_bits = explode( '/', str_replace( 'http://', '', $post->guid ) );
+
+				if ( '' == $structure ) {
+					// We're using the default structure, so many a query string.
+					$args = array( 'givengain-type' => $url_bits[1] );
+					if ( isset( $url_bits[2] ) && '' != $url_bits[2] ) {
+						$args['givengain-entry'] = $url_bits[2];
+					}
+					foreach ( $args as $k => $v ) {
+						$url = add_query_arg( $k, urlencode( $v ), $url );
+					}
+				} else {
+					// Make a pretty permalink.
+					$url = trailingslashit( site_url( '/givengain' ) ) . trailingslashit( urlencode( $url_bits[1] ) ) . trailingslashit( urlencode( $url_bits[2] ) );
+				}
+
+				$permalink = $url;
 			}
 		}
 
@@ -133,6 +157,13 @@ final class Givengain_Frontend {
 		$response->guid = $data->link;
 		$response->post_type = 'givengain';
 		$response->givengain_data = array();
+
+		// A few parameters are only there for single entries. Work with those.
+		if ( isset( $data->description ) ) {
+			$response->post_content = $data->description;
+			$response->post_excerpt = apply_filters( 'get_the_excerpt', $data->description );
+			unset( $data->description );
+		}
 
 		// Remove the parameters we've already used.
 		unset( $data->id );
