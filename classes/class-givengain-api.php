@@ -43,6 +43,9 @@ final class Givengain_API {
 				else
 					return '';
 			break;
+			case 'accepted_endpoints':
+				return $this->_get_accepted_endpoints();
+			break;
 			default:
 			break;
 		}
