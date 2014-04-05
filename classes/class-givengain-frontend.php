@@ -83,6 +83,7 @@ final class Givengain_Frontend {
 
 			foreach ( $data as $k => $v ) {
 				$count++;
+				$v->type = $type; // Pass the type value through as well.
 				$data[$k] = $this->_format_api_response( $v );
 				if ( 1 == $count ) {
 					$post = $data[$k];
@@ -168,6 +169,9 @@ final class Givengain_Frontend {
 		$response->post_type = 'givengain';
 		$response->givengain_data = array();
 
+		// Backup the original object, for passing through to filters.
+		$original_data = $data;
+
 		// A few parameters are only there for single entries or special cases. Work with those.
 		if ( isset( $data->name ) ) {
 			$response->post_title = $data->name;
@@ -187,7 +191,7 @@ final class Givengain_Frontend {
 		}
 
 		if ( isset( $data->description ) ) {
-			$response->post_content = $data->description;
+			$response->post_content = apply_filters( 'givengain_entry_description', $data->description, $original_data );
 			$response->post_excerpt = apply_filters( 'get_the_excerpt', $data->description );
 			unset( $data->description );
 		}

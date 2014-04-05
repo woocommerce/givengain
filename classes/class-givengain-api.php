@@ -116,6 +116,9 @@ final class Givengain_API {
 		if ( ! $this->_has_access_token() || ! in_array( $endpoint, $this->_get_accepted_endpoints() ) ) return false;
 		// Detect and parse the various ID values possible for API endpoints.
 		$parsed = $this->_parse_api_endpoint_id_values( $endpoint, $args );
+
+		$parsed['args']['visible'] = true;
+
 		$response = $this->_request( $parsed['endpoint'], $parsed['args'], $method );
 
 		if( is_wp_error( $response ) ) {

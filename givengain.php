@@ -15,6 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 // Load in the frontend template functions.
 require_once( 'givengain-template.php' );
 
+// Load in the hooked functions.
+require_once( 'givengain-hooks.php' );
+
 /**
  * Returns the main instance of Givengain to prevent the need to use globals.
  *

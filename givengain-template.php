@@ -1,6 +1,30 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+if ( ! function_exists( 'givengain_construct_permalink' ) ) {
+/**
+ * Create an internal permalink for a given entry.
+ * @since  1.0.0
+ * @return string
+ */
+function givengain_construct_permalink ( $args ) {
+	$structure = get_option( 'permalink_structure' );
+	$url = site_url();
+
+	if ( '' == $structure ) {
+		// We're using the default structure, so many a query string.
+		foreach ( $args as $k => $v ) {
+			$url = add_query_arg( $k, urlencode( $v ), $url );
+		}
+	} else {
+		// Make a pretty permalink.
+		$url = trailingslashit( site_url( '/givengain' ) ) . trailingslashit( urlencode( $args['givengain-type'] ) ) . trailingslashit( urlencode( $args['givengain-entry'] ) );
+	}
+
+	return $url;
+} // End givengain_construct_permalink()
+}
+
 if ( ! function_exists( 'is_givengain_single' ) ) {
 /**
  * Determine if we're viewing a GivenGain entry.
