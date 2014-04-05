@@ -2,6 +2,44 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
+ * Display a list of an entry's posts, if applicable.
+ * @since  1.0.0
+ * @param  string $content The content.
+ * @param  object $data    The current data object.
+ * @return string          The modified content.
+ */
+function givengain_maybe_add_posts_list ( $content, $data ) {
+	if ( is_object( $data ) && isset( $data->posts ) && 0 < count( (array)$data->posts ) ) {
+		// Loop through and grab only published posts.
+		$entries = array();
+		foreach ( $data->posts as $k => $v ) {
+			$entry = givengain_get_data( $data->type . '_post/%' . $data->type . '_post_id%', array( $data->type . '_post_id' => intval( $v ) ) );
+			if ( is_object( $entry ) && isset( $entry->id ) ) {
+				$entries[$v] = $entry;
+			}
+		}
+
+		if ( 0 < count( $entries ) ) {
+			$html = '';
+			$html .= '<h3>' . __( 'Posts', 'givengain' ) . '</h3>' . "\n";
+			$html .= '<ul class="givengain-posts">' . "\n";
+			foreach ( $entries as $k => $v ) {
+				$html .= '<li class="givengain-post post-id-' . esc_attr( $k ) . '">' . "\n";
+				$html .= '<a href="' . esc_url( givengain_construct_permalink( array( 'givengain-type' => $data->type . '_post', 'givengain-entry' => $k ) ) ) . '">' . esc_html( $entry->name ) . '</a>' . "\n";
+				$html .= '</li>' . "\n";
+			}
+			$html .= '</ul>' . "\n";
+		}
+
+		if ( '' != $html ) {
+			$content .= ' ' . $html;
+		}
+	}
+	return $content;
+} // End givengain_maybe_add_posts_list()
+add_filter( 'givengain_entry_description', 'givengain_maybe_add_posts_list', 10, 2 );
+
+/**
  * Display a list of an entry's projects, if applicable.
  * @since  1.0.0
  * @param  string $content The content.
@@ -10,14 +48,26 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 function givengain_maybe_add_projects_list ( $content, $data ) {
 	if ( is_object( $data ) && isset( $data->projects ) && 0 < count( (array)$data->projects ) ) {
-		$html = '<ul class="givengain-projects">' . "\n";
+		// Loop through and grab only published posts.
+		$entries = array();
 		foreach ( $data->projects as $k => $v ) {
 			$entry = givengain_get_data( $data->type . '_project/%' . $data->type . '_project_id%', array( $data->type . '_project_id' => intval( $v ) ) );
-			$html .= '<li class="project project-id-' . esc_attr( $v ) . '">' . "\n";
-			$html .= '<a href="' . esc_url( givengain_construct_permalink( array( 'givengain-type' => $data->type . '_project', 'givengain-entry' => $v ) ) ) . '">' . esc_html( $entry->name ) . '</a>' . "\n";
-			$html .= '</li>' . "\n";
+			if ( is_object( $entry ) && isset( $entry->id ) ) {
+				$entries[$v] = $entry;
+			}
 		}
-		$html .= '</ul>' . "\n";
+
+		if ( 0 < count( $entries ) ) {
+			$html = '';
+			$html .= '<h3>' . __( 'Projects', 'givengain' ) . '</h3>' . "\n";
+			$html .= '<ul class="givengain-projects">' . "\n";
+			foreach ( $entries as $k => $v ) {
+				$html .= '<li class="givengain-project project-id-' . esc_attr( $k ) . '">' . "\n";
+				$html .= '<a href="' . esc_url( givengain_construct_permalink( array( 'givengain-type' => $data->type . '_project', 'givengain-entry' => $k ) ) ) . '">' . esc_html( $entry->name ) . '</a>' . "\n";
+				$html .= '</li>' . "\n";
+			}
+			$html .= '</ul>' . "\n";
+		}
 
 		if ( '' != $html ) {
 			$content .= ' ' . $html;
@@ -41,5 +91,5 @@ function givengain_add_linkback ( $content, $data ) {
 	}
 	return $content;
 } // End givengain_add_linkback()
-add_filter( 'givengain_entry_description', 'givengain_add_linkback', 10, 2 );
+add_filter( 'givengain_entry_description', 'givengain_add_linkback', 20, 2 );
 ?>

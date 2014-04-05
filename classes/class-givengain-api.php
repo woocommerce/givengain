@@ -117,7 +117,11 @@ final class Givengain_API {
 		// Detect and parse the various ID values possible for API endpoints.
 		$parsed = $this->_parse_api_endpoint_id_values( $endpoint, $args );
 
-		$parsed['args']['visible'] = true;
+		if ( in_array( $parsed['endpoint'], array( 'cause_post', 'cause_post/%cause_post_id%' ) ) ) {
+			$parsed['args']['status'] = 'A';
+		} else {
+			$parsed['args']['visible'] = true;
+		}
 
 		$response = $this->_request( $parsed['endpoint'], $parsed['args'], $method );
 
