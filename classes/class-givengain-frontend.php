@@ -77,6 +77,25 @@ final class Givengain_Frontend {
 
 		if ( 0 < count( $data ) ) {
 			$count = 0;
+
+			// If it's a single entry, add some extra data.
+			if ( is_givengain_single() && ( stristr( $type, 'post' ) || stristr( $type, 'project' ) ) ) {
+				$author_endpoint = $endpoint;
+				$author_endpoint = str_replace( '_project', '', $author_endpoint );
+				$author_endpoint = str_replace( '_post', '', $author_endpoint );
+				$author_endpoint = str_replace( '_id/', '/', $author_endpoint );
+				$type_arg_bits = explode( '/', $author_endpoint );
+				$type_arg = str_replace( '%', '', $type_arg_bits[1] );
+
+				$author_args = array();
+
+				if ( isset( $data[0]->cause_id ) ) {
+					$author_args[$type_arg] = $data[0]->cause_id;
+				}
+
+				$author_data = $this->_get_api_data( $author_endpoint, $author_args );
+			}
+
 			// Backup normal posts, and replace with GivenGain posts.
 			$wp_object_cache->normal_posts = $wp_object_cache->posts;
 			$wp_object_cache->posts = array();
@@ -87,6 +106,11 @@ final class Givengain_Frontend {
 				$data[$k] = $this->_format_api_response( $v );
 				if ( 1 == $count ) {
 					$post = $data[$k];
+				}
+				// Author data.
+				if ( isset( $author_data ) ) {
+					$post->author = 'givengain-' . $author_data->id;
+					$post->author_name = esc_html( $author_data->name );
 				}
 				wp_cache_add( $data[$k]->ID, $data[$k], 'posts' );
 				$wp_query->posts[] = $data[$k];
