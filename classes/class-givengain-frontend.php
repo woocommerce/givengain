@@ -52,7 +52,7 @@ final class Givengain_Frontend {
 	 * @return  void
 	 */
 	public function hijack_wp_query () {
-		global $wp_query, $post, $wp_object_cache, $authordata;
+		global $wp_query, $post, $wp_object_cache, $authordata, $paged;
 		if ( ! is_givengain_archive() && ! is_givengain_single() ) return;
 
 		$type = get_query_var( 'givengain-type' );
@@ -67,6 +67,11 @@ final class Givengain_Frontend {
 		} else {
 			$endpoint = $type;
 			$args = array();
+		}
+
+		// Handle pagination.
+		if ( is_givengain_archive() ) {
+			$args['page'] = $paged;
 		}
 
 		$data = $this->_get_api_data( $endpoint, $args );
@@ -123,9 +128,14 @@ final class Givengain_Frontend {
 				$wp_query->posts[] = $data[$k];
 			}
 
+			$max_num_pages = 1;
+			if ( is_givengain_archive() ) {
+				$max_num_pages = 100;
+			}
+
 			$wp_query->post_count = count( $wp_query->posts );
 			$wp_query->found_posts = count( $wp_query->posts );
-			$wp_query->max_num_pages = 1;
+			$wp_query->max_num_pages = $max_num_pages;
 			$wp_query->is_404 = false;
 			if ( '' == $entry ) {
 				$wp_query->is_archive = true;
