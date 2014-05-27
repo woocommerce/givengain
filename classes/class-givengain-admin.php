@@ -56,7 +56,6 @@ final class Givengain_Admin {
 	public function settings_screen () {
 		global $title;
 		echo '<div class="wrap">' . "\n";
-		screen_icon();
 		echo '<h2>' . esc_html( sprintf( __( '%s Settings', 'givengain' ), $title ) ) . '</h2>' . "\n";
 		echo '<form action="options.php" method="post">' . "\n";
 		settings_fields( $this->_token );
