@@ -41,10 +41,6 @@ final class Givengain_Admin {
 	 */
 	public function register_settings_screen () {
 		$this->hook = add_options_page( __( 'GivenGain', 'givengain' ), __( 'GivenGain', 'givengain' ), 'edit_theme_options', 'givengain', array( $this, 'settings_screen' ) );
-
-		if ( isset( $_GET['page'] ) && ( 'givengain' == $_GET['page'] ) ) {
-			add_action( 'admin_notices', array( $this, 'admin_notices' ) );
-		}
 	} // End register_settings_screen()
 
 	/**
@@ -149,16 +145,6 @@ final class Givengain_Admin {
 			echo '<p><span class="description">' . $args['data']['description'] . '</span></p>' . "\n";
 		}
 	} // End form_field_textarea()
-
-	/**
-	 * Optionally display admin notices.
-	 * @access  public
-	 * @since   1.0.0
-	 * @return  void
-	 */
-	public function admin_notices () {
-		settings_errors( $this->_token . '-errors' );
-	} // End admin_notices()
 
 	/**
 	 * Add error to our internal error log.
