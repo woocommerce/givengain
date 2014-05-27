@@ -28,6 +28,7 @@ final class Givengain_Frontend {
 		add_action( 'template_redirect', array( $this, 'hijack_wp_query' ) );
 		add_filter( 'post_link', array( $this, 'hijack_permalink' ), 10, 3 );
 		add_action( 'the_post', array( $this, 'setup_the_post' ) );
+		add_filter( 'the_author', array( $this, 'hijack_the_author' ), 50, 1 );
 	} // End __construct()
 
 	/**
@@ -37,6 +38,9 @@ final class Givengain_Frontend {
 	 * @return  void
 	 */
 	public function setup_the_post () {
+		global $authordata;
+		echo '<xmp>'; print_r( $authordata ); echo '</xmp>'; // DEBUG
+
 		if ( ! is_givengain_archive() && ! is_givengain_single() ) return;
 		global $post, $wp_object_cache, $wp_query;
 		$post_data = get_post( $post );
@@ -51,7 +55,7 @@ final class Givengain_Frontend {
 	 * @return  void
 	 */
 	public function hijack_wp_query () {
-		global $wp_query, $post, $wp_object_cache;
+		global $wp_query, $post, $wp_object_cache, $authordata;
 		if ( ! is_givengain_archive() && ! is_givengain_single() ) return;
 
 		$type = get_query_var( 'givengain-type' );
@@ -111,6 +115,12 @@ final class Givengain_Frontend {
 				if ( isset( $author_data ) ) {
 					$post->author = 'givengain-' . $author_data->id;
 					$post->author_name = esc_html( $author_data->name );
+
+					$authordata = new WP_User( 'givengain-' . $author_data->id, esc_html( $author_data->name ) );
+					$authordata->data = new StdClass();
+					$authordata->id = 'givengain-' . $author_data->id;
+					$authordata->data->id = 'givengain-' . $author_data->id;
+					$authordata->data->display_name = esc_html( $author_data->name );
 				}
 				wp_cache_add( $data[$k]->ID, $data[$k], 'posts' );
 				$wp_query->posts[] = $data[$k];
@@ -127,6 +137,22 @@ final class Givengain_Frontend {
 			}
 		}
 	} // End hijack_wp_query()
+
+	/**
+	 * Replace the author with the GivenGain constructed author.
+	 * @access  public
+	 * @since   1.0.0
+	 * @param   object/string $author    The author.
+	 * @return  object/string            The modified author.
+	 */
+	public function hijack_the_author ( $author ) {
+		global $post;
+		if ( 'givengain' == $post->post_type ) {
+			// TODO
+		}
+
+		return $author;
+	} // End hijack_the_author()
 
 	/**
 	 * Replace the permalink with the GivenGain constructed URL.
