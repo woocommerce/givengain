@@ -38,9 +38,6 @@ final class Givengain_Frontend {
 	 * @return  void
 	 */
 	public function setup_the_post () {
-		global $authordata;
-		echo '<xmp>'; print_r( $authordata ); echo '</xmp>'; // DEBUG
-
 		if ( ! is_givengain_archive() && ! is_givengain_single() ) return;
 		global $post, $wp_object_cache, $wp_query;
 		$post_data = get_post( $post );
