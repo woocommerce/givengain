@@ -114,6 +114,14 @@ final class Givengain_API {
 	public function get_data ( $endpoint, $args = array(), $method = 'get' ) {
 		$data = array();
 		if ( ! $this->_has_access_token() || ! in_array( $endpoint, $this->_get_accepted_endpoints() ) ) return false;
+		// Set default args.
+		if ( ! isset( $args['limit'] ) ) {
+			$args['limit'] = get_option( 'posts_per_page', 19 );
+		}
+		if ( ! isset( $args['page'] ) ) {
+			$args['page'] = 1;
+		}
+
 		// Detect and parse the various ID values possible for API endpoints.
 		$parsed = $this->_parse_api_endpoint_id_values( $endpoint, $args );
 
