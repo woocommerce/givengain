@@ -86,10 +86,38 @@ add_filter( 'givengain_entry_description', 'givengain_maybe_add_projects_list', 
  */
 function givengain_add_linkback ( $content, $data ) {
 	if ( is_object( $data ) && isset( $data->link ) ) {
-		$text = __( 'View more on GivenGain.com', 'givengain' );
+		$text = __( 'View on GivenGain.com', 'givengain' );
 		$content .= ' <a href="' . esc_url( $data->link ) . '" class="button" title="' . esc_attr( $text ) . '">' . $text . '</a>' . "\n";
 	}
 	return $content;
 } // End givengain_add_linkback()
-add_filter( 'givengain_entry_description', 'givengain_add_linkback', 20, 2 );
+add_filter( 'givengain_entry_description', 'givengain_add_linkback', 30, 2 );
+
+/**
+ * Display a link back to the relevant parent entry.
+ * @since  1.0.0
+ * @param  string $content The content.
+ * @param  object $data    The current data object.
+ * @return string          The modified content.
+ */
+function givengain_maybe_add_parent_link ( $content, $data ) {
+	if ( is_object( $data ) ) {
+		if ( isset( $data->type ) ) {
+			$type_bits = explode( '_', $data->type );
+			$parent_type_id = $type_bits[0] . '_id';
+			if ( isset( $data->$parent_type_id ) ) {
+				$endpoint = $type_bits[0] . '/%' . esc_attr( $type_bits[0] ) . '_id%';
+				$args = array( $type_bits[0] . '_id' => $data->$parent_type_id );
+				$parent = givengain_get_data( $endpoint, $args );
+				if ( ! isset( $parent->id ) || ! isset( $parent->name ) ) {
+					return; // No data, no display.
+				}
+				$text = sprintf( __( 'Read more about %s', 'givengain' ), $parent->name );
+				$content .= ' <a href="' . esc_url( givengain_construct_permalink( array( 'givengain-type' => $type_bits[0], 'givengain-entry' => $parent->id ) ) ) . '" class="button" title="' . esc_attr( $text ) . '">' . $text . '</a>' . "\n";
+			}
+		}
+	}
+	return $content;
+} // End givengain_maybe_add_parent_link()
+add_filter( 'givengain_entry_description', 'givengain_maybe_add_parent_link', 20, 2 );
 ?>
