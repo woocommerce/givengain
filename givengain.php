@@ -118,7 +118,7 @@ final class Givengain {
 		}
 
 		// Run this on activation.
-		register_activation_hook( $this->file, array( $this, 'activation' ) );
+		register_activation_hook( $this->_file, array( $this, 'activation' ) );
 	} // End __construct()
 
 	/**
