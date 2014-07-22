@@ -25,12 +25,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 class Givengain_Widget_Base extends WP_Widget {
 
 	/* Variable Declarations */
-	protected $slider_type;
 	protected $defaults = array( 'title' => '' );
 	protected $givengain_widget_cssclass;
 	protected $givengain_widget_description;
 	protected $givengain_widget_idbase;
 	protected $givengain_widget_title;
+	protected $givengain_endpoint;
+	protected $givengain_fields;
 
 	/**
 	 * __construct function.
@@ -44,6 +45,8 @@ class Givengain_Widget_Base extends WP_Widget {
 		$this->givengain_widget_description = __( 'A GivenGain widget for your site', 'givengain' );
 		$this->givengain_widget_idbase = 'widget_givengain';
 		$this->givengain_widget_title = __( 'GivenGain', 'givengain' );
+		$this->givengain_endpoint = '';
+		$this->givengain_fields = $this->get_fields();
 
 		$this->init();
 	} // End Constructor
@@ -155,6 +158,22 @@ class Givengain_Widget_Base extends WP_Widget {
 			<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title (optional):', 'givengain' ); ?></label>
 			<input type="text" name="<?php echo $this->get_field_name( 'title' ); ?>"  value="<?php echo $instance['title']; ?>" class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" />
 		</p>
+		<?php
+			if ( 0 < count( $this->givengain_fields ) ) {
+				foreach ( $this->givengain_fields as $k => $v ) {
+		?>
+		<p>
+			<?php
+				$field_label = '<label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label>' . "\n";
+				if ( $v['type'] != 'checkbox' ) { echo $field_label; } // Display the label first if the field isn't a checkbox.
+				$this->generate_field_by_type( $v['type'], $v['args'], $instance );
+				if ( $v['type'] == 'checkbox' ) { echo $field_label; } // Display the label last if the field is a checkbox.
+			?>
+		</p>
+		<?php
+				}
+			}
+		?>
 <?php
 		// Allow child themes/plugins to act here.
 		do_action( $this->givengain_widget_idbase . '_widget_settings', $instance, $this );
@@ -169,7 +188,7 @@ class Givengain_Widget_Base extends WP_Widget {
 	 * @param  array $instance The current widget's instance.
 	 * @return void
 	 */
-	private function generate_field_by_type ( $type, $args, $instance ) {
+	protected function generate_field_by_type ( $type, $args, $instance ) {
 		if ( is_array( $args ) && isset( $args['key'] ) && isset( $args['data'] ) ) {
 			$html = '';
 			switch ( $type ) {
@@ -232,5 +251,15 @@ class Givengain_Widget_Base extends WP_Widget {
 		// TODO
 		return $html;
 	} // End givengain_output()
+
+	/**
+	 * Return an array of field data.
+	 * @since  1.0.0
+	 * @return array Field data for the fields pertaining to this widget.
+	 */
+	protected function get_fields () {
+		// Override this in the extended class.
+		return array();
+	} // End get_fields()
 } // End Class
 ?>
