@@ -117,9 +117,25 @@ final class Givengain {
 			$this->context = new Givengain_Frontend( $this->_file, $this->api );
 		}
 
+		// Register our widgets.
+		add_action( 'widgets_init', array( $this, 'register_widgets' ) );
+
 		// Run this on activation.
 		register_activation_hook( $this->_file, array( $this, 'activation' ) );
 	} // End __construct()
+
+	/**
+	 * Register Givengain Widgets.
+	 * @access public
+	 * @since  1.0.0
+	 * @return void
+	 */
+	public function register_widgets () {
+		require_once( 'classes/class-givengain-widget-base.php' );
+		require_once( 'classes/class-givengain-widget-causes.php' );
+
+		register_widget( 'Givengain_Widget_Causes' );
+	} // End register_widgets()
 
 	/**
 	 * Main Givengain Instance
