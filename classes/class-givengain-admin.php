@@ -302,7 +302,7 @@ final class Givengain_Admin {
 		if ( ( isset( $_GET['page'] ) && 'givengain' == $_GET['page'] ) ) return; // Don't show these notices on our admin screen.
 
 		$settings = $this->get_settings();
-		if ( ! isset( $settings['api_key'] ) || '' == $settings['api_key'] ) {
+		if ( ! isset( $settings['access_token'] ) || '' == $settings['access_token'] ) {
 			$url = add_query_arg( 'page', 'givengain', admin_url( 'admin.php' ) );
 			echo '<div class="updated fade"><p>' . sprintf( __( '%sGivenGain is almost ready.%s To get started, %senter your GivenGain API key%s.', 'givengain' ), '<strong>', '</strong>', '<a href="' . esc_url( $url ) . '">', '</a>' ) . '</p></div>' . "\n";
 		}
