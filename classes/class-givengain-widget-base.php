@@ -1,5 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! function_exists( 'givengain_output' ) ) exit; // Exit if the required function isn't present.
 
 /**
  * Givengain Widget Base Class
@@ -76,8 +77,14 @@ class Givengain_Widget_Base extends WP_Widget {
 	 * @return void
 	 */
 	public function widget ( $args, $instance ) {
-		$givengain_output = $this->generate_output( $instance );
-		if ( $givengain_output == '' ) { return; }
+		$content_args = $instance;
+		if ( isset( $content_args['title'] ) ) {
+			unset( $content_args['title'] );
+		}
+
+		$givengain_output = $this->generate_output( $content_args );
+
+		if ( '' == $givengain_output ) { return; }
 
 		$html = '';
 
@@ -122,8 +129,6 @@ class Givengain_Widget_Base extends WP_Widget {
 	 * @return array $instance
 	 */
 	public function update ( $new_instance, $old_instance ) {
-		global $wooslider;
-
 		$instance = $old_instance;
 
 		/* Strip tags for title and name to remove HTML (important for text inputs). */
@@ -247,10 +252,11 @@ class Givengain_Widget_Base extends WP_Widget {
 	 * @since  1.0.0
 	 * @return string The generated HTML.
 	 */
-	protected function givengain_output ( $instance ) {
-		// TODO
+	protected function generate_output ( $instance ) {
+		$instance['echo'] = false;
+		$html = givengain_output( $this->givengain_endpoint, $instance );
 		return $html;
-	} // End givengain_output()
+	} // End generate_output()
 
 	/**
 	 * Return an array of field data.

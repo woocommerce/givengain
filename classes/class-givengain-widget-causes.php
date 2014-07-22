@@ -24,8 +24,9 @@ class Givengain_Widget_Causes extends Givengain_Widget_Base {
 	 * @return void
 	 */
 	public function __construct () {
+		parent::__construct();
 		/* Widget variable settings. */
-		$this->givengain_endpoint = 'causes';
+		$this->givengain_endpoint = 'cause';
 		$this->givengain_widget_cssclass = 'widget_givengain_causes';
 		$this->givengain_widget_description = __( 'A slideshow of posts on your site', 'givengain' );
 		$this->givengain_widget_idbase = 'widget_givengain_causes';
