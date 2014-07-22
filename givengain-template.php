@@ -134,7 +134,7 @@ function givengain_output ( $type = 'cause', $args = '' ) {
 			$html .= '<div class="givengain givengain-' . esc_attr( $class ) . ' columns-' . esc_attr( intval( $args['per_row'] ) ) . '">' . "\n";
 
 			// Begin templating logic.
-			$tpl = '<div class="%%CLASS%%">%%IMAGE%%<h3 class="feature-title">%%TITLE%%</h3><div class="feature-content">%%CONTENT%%</div></div>';
+			$tpl = '<li class="%%CLASS%%">%%IMAGE%%<span class="item-title">%%TITLE%%</span><div class="item-content">%%CONTENT%%</div></li>';
 			$tpl = apply_filters( 'givengain_item_template', $tpl, $type, $args );
 			$tpl = apply_filters( 'givengain_' . esc_attr( $type ) . '_item_template', $tpl, $type, $args );
 
@@ -142,6 +142,8 @@ function givengain_output ( $type = 'cause', $args = '' ) {
 
 			// If this isn't array, we can assume this is a single item. Cast as an array to make life easier for our loop.
 			if ( ! is_array( $query ) ) $query = array( $query );
+
+			$html .= '<ul>' . "\n";
 
 			foreach ( $query as $post ) {
 				$template = $tpl;
@@ -188,6 +190,8 @@ function givengain_output ( $type = 'cause', $args = '' ) {
 					$html .= '<div class="fix"></div>' . "\n";
 				}
 			}
+
+			$html .= '</ul>' . "\n";
 
 			$html .= '</div><!--/.' . esc_attr( $type ) . '-->' . "\n";
 			$html .= $args['after'] . "\n";
