@@ -35,8 +35,24 @@ class Givengain_Widget_Causes extends Givengain_Widget_Base {
 		$this->init();
 
 		$this->defaults = array(
-						'title' => __( 'Causes', 'givengain' )
+						'title' => __( 'Causes', 'givengain' ),
+						'limit' => 5,
+						'per_row' => 1
 					);
 	} // End Constructor
+
+	/**
+	 * Return an array of field data.
+	 * @since  1.0.0
+	 * @return array Field data for the fields pertaining to this widget.
+	 */
+	protected function get_fields () {
+		$fields = array();
+
+		$fields['limit'] = array( 'type' => 'text', 'name' => __( 'Limit', 'givengain' ), 'args' => array( 'key' => 'limit' ) );
+		$fields['per_row'] = array( 'type' => 'text','name' => __( 'Per Row', 'givengain' ), 'args' => array( 'key' => 'per_row' ) );
+
+		return $fields;
+	} // End get_fields()
 } // End Class
 ?>

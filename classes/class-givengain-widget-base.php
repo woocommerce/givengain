@@ -134,6 +134,33 @@ class Givengain_Widget_Base extends WP_Widget {
 		/* Strip tags for title and name to remove HTML (important for text inputs). */
 		$instance['title'] = esc_html( $new_instance['title'] );
 
+		/* Cater for new fields and preserve old fields if they aren't part of our current fields to be saved. */
+		// Save fields for the current type.
+		if ( 0 < count( $this->givengain_fields ) ) {
+			foreach ( $this->givengain_fields as $i => $j ) {
+				switch ( $j['type'] ) {
+					case 'checkbox':
+						if ( isset( $new_instance[$i] ) && ( $new_instance[$i] == 1 ) ) {
+							$instance[$i] = (bool)intval( $new_instance[$i] );
+						} else {
+							$instance[$i] = false;
+						}
+					break;
+
+					case 'multicheck':
+						$instance[$i] = array_map( 'esc_attr', $new_instance[$i] );
+					break;
+
+					case 'text':
+					case 'select':
+					case 'images':
+					case 'range':
+						$instance[$i] = esc_attr( $new_instance[$i] );
+					break;
+				}
+			}
+		}
+
 		// Allow child themes/plugins to act here.
 		$instance = apply_filters( $this->givengain_widget_idbase . '_widget_save', $instance, $new_instance, $this );
 
@@ -170,9 +197,9 @@ class Givengain_Widget_Base extends WP_Widget {
 		<p>
 			<?php
 				$field_label = '<label for="' . esc_attr( $k ) . '">' . $v['name'] . '</label>' . "\n";
-				if ( $v['type'] != 'checkbox' ) { echo $field_label; } // Display the label first if the field isn't a checkbox.
+				if ( 'checkbox' != $v['type'] ) { echo $field_label; } // Display the label first if the field isn't a checkbox.
 				$this->generate_field_by_type( $v['type'], $v['args'], $instance );
-				if ( $v['type'] == 'checkbox' ) { echo $field_label; } // Display the label last if the field is a checkbox.
+				if ( 'checkbox' == $v['type'] ) { echo $field_label; } // Display the label last if the field is a checkbox.
 			?>
 		</p>
 		<?php
@@ -194,7 +221,7 @@ class Givengain_Widget_Base extends WP_Widget {
 	 * @return void
 	 */
 	protected function generate_field_by_type ( $type, $args, $instance ) {
-		if ( is_array( $args ) && isset( $args['key'] ) && isset( $args['data'] ) ) {
+		if ( is_array( $args ) && isset( $args['key'] ) ) {
 			$html = '';
 			switch ( $type ) {
 				// Select fields.
