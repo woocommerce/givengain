@@ -104,7 +104,7 @@ class Givengain_Widget_Base extends WP_Widget {
 		/* Widget content. */
 
 		// Add actions for plugins/themes to hook onto.
-		do_action( $this->givengain_widget_cssclass . '_top' );
+		do_action( $this->givengain_widget_cssclass . '_top', $content_args );
 
 		// Load widget content here.
 		$html = '';
@@ -114,7 +114,7 @@ class Givengain_Widget_Base extends WP_Widget {
 		echo $html;
 
 		// Add actions for plugins/themes to hook onto.
-		do_action( $this->givengain_widget_cssclass . '_bottom' );
+		do_action( $this->givengain_widget_cssclass . '_bottom', $content_args );
 
 		/* After widget (defined by themes). */
 		echo $after_widget;

@@ -135,8 +135,10 @@ final class Givengain {
 	public function register_widgets () {
 		require_once( 'classes/class-givengain-widget-base.php' );
 		require_once( 'classes/class-givengain-widget-causes.php' );
+		require_once( 'classes/class-givengain-widget-cause-details.php' );
 
 		register_widget( 'Givengain_Widget_Causes' );
+		register_widget( 'Givengain_Widget_Cause_Details' );
 	} // End register_widgets()
 
 	/**

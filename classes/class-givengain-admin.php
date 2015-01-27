@@ -16,7 +16,7 @@ final class Givengain_Admin {
 	private $fields = null;
 	private $_token = 'givengain';
 	private $errors = array();
-	private $_api = '';
+	public $api = '';
 	private $_file = '';
 
 	/**
@@ -27,7 +27,8 @@ final class Givengain_Admin {
 	 */
 	public function __construct ( $file, $api_obj ) {
 		$this->_file = $file;
-		$this->_api = $api_obj;
+		$this->api = $api_obj;
+
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_menu', array( $this, 'register_settings_screen' ) );
 		add_action( 'admin_notices', array( $this, 'maybe_display_admin_notices' ) );
