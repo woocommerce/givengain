@@ -98,6 +98,8 @@ final class Givengain {
 		$this->_file = __FILE__;
 		$this->_version = '1.0.0';
 
+		add_filter( 'givengain_link_externally', '__return_true' );
+
 		// Instantiate the GivenGain API connector class.
 		require_once( 'classes/class-givengain-api.php' );
 		$this->api = new Givengain_API( $this->_file );
