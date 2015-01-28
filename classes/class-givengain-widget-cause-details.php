@@ -36,8 +36,6 @@ class Givengain_Widget_Cause_Details extends Givengain_Widget_Base {
 
 		$this->defaults = array(
 						'title' => __( 'Cause Details', 'givengain' ),
-						'limit' => 5,
-						'per_row' => 1,
 						'cause_id' => 0
 					);
 
@@ -61,8 +59,6 @@ class Givengain_Widget_Cause_Details extends Givengain_Widget_Base {
 			}
 		}
 
-		$fields['limit'] = array( 'type' => 'text', 'name' => __( 'Limit', 'givengain' ), 'args' => array( 'key' => 'limit' ) );
-		$fields['per_row'] = array( 'type' => 'text','name' => __( 'Per Row', 'givengain' ), 'args' => array( 'key' => 'per_row' ) );
 		$fields['cause_id'] = array( 'type' => 'select','name' => __( 'Cause', 'givengain' ), 'args' => array( 'key' => 'cause_id', 'data' => array( 'options' => $causes ) ) );
 
 		return $fields;
